@@ -3,7 +3,7 @@
     <v-main>
       <div class="d-flex justify-space-around">
         <l-map
-          style="height: 500px; width: 500px"
+          style="height: 500px; width: 500px; z-index: 0"
           :zoom="zoom"
           :center="center"
           ref="map"
@@ -45,6 +45,16 @@
           </tr>
         </tbody>
       </v-simple-table>
+      <v-dialog v-model="dialog" persistent max-width="450">
+        <v-card>
+          <v-card-title primary-title> Editar Poligono </v-card-title>
+          <v-card-text>
+            <v-color-picker v-model="item.cor"></v-color-picker>
+            <v-text-field label="Cor" v-model="item.cor"></v-text-field>
+          </v-card-text>
+          <v-card-actions> Action </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-main>
   </v-app>
 </template>
@@ -98,12 +108,15 @@ export default {
       map.on(L.Draw.Event.CREATED, function (e) {
         var layer = e.layer;
         drawnItems.addLayer(layer);
-        layer.on("click", function (e) {
-          // do something here like display a popup
+        layer.on("click", (e) => {
           const index = vm.polygon.findIndex((el) => {
             return el.id == e.target._leaflet_id;
           });
-          if (index != -1) vm.select(vm.polygon[index]);
+          if (index != -1) {
+            vm.item = vm.polygon[index];
+            vm.select(vm.polygon[index]);
+            vm.dialog = true;
+          }
         });
         vm.polygon.push({
           id: layer._leaflet_id,
@@ -149,10 +162,6 @@ export default {
           }
         });
       });
-
-      map.on("draw:markercontext", function (e) {
-        console.log(e);
-      });
     });
   },
 
@@ -163,6 +172,8 @@ export default {
     center: [-19.7532845, -47.9363265],
     polygon: [],
     selecionado: [],
+    dialog: false,
+    item: {},
   }),
   methods: {
     select(item) {
