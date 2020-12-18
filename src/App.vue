@@ -157,12 +157,10 @@ export default {
         edit: {
           featureGroup: drawnItems,
           edit: {
-            // this property shouldn't be needed
-            selectedPathOptions: {
-              // this property should be one level up
-              color: "#000",
-              fillColor: "#000",
-            },
+            // selectedPathOptions: {
+            //   color: "#000",
+            //   fillColor: "#000",
+            // },
           },
         },
         draw: {
@@ -222,6 +220,11 @@ export default {
         vm.deletable = false;
       });
       map.on("draw:editstop", function () {
+        vm.polygon.forEach((e) => {
+          vm.$refs.map.mapObject._layers[e.id].setStyle({
+            color: e.cor,
+          });
+        });
         vm.editable = false;
         vm.deletable = false;
       });
@@ -291,7 +294,7 @@ export default {
       },
     ],
 
-    zoom: 14,
+    zoom: 16,
     center: [-19.7532845, -47.9363265],
     polygon: [],
     selecionado: {},
