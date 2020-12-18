@@ -156,17 +156,9 @@ export default {
         position: "topright",
         edit: {
           featureGroup: drawnItems,
+          edit: {},
         },
         draw: {
-          handlers: {
-            polygon: {
-              tooltip: {
-                start: "- your text-.",
-                cont: "- your text-.",
-                end: "- your text-.",
-              },
-            },
-          },
           polygon: {
             allowIntersection: false,
             showArea: true,
