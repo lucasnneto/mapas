@@ -156,14 +156,17 @@ export default {
         position: "topright",
         edit: {
           featureGroup: drawnItems,
-          edit: {
-            // selectedPathOptions: {
-            //   color: "#000",
-            //   fillColor: "#000",
-            // },
-          },
         },
         draw: {
+          handlers: {
+            polygon: {
+              tooltip: {
+                start: "- your text-.",
+                cont: "- your text-.",
+                end: "- your text-.",
+              },
+            },
+          },
           polygon: {
             allowIntersection: false,
             showArea: true,
@@ -179,6 +182,79 @@ export default {
       });
 
       map.addControl(drawControl);
+      //
+      //https://stackoverflow.com/questions/48661724/leaflet-draw-edit-control-custom-text
+      //
+      L.drawLocal.draw.toolbar = {
+        actions: {
+          title: "Cancelar",
+          text: "Cancelar",
+        },
+        finish: {
+          title: "Finalizar",
+          text: "Finalizar",
+        },
+        undo: {
+          title: "Desfazer",
+          text: "Desfazer ultimo ponto",
+        },
+        buttons: {
+          polygon: "Desenhar um polígono",
+        },
+      };
+      L.drawLocal.draw.handlers = {
+        polygon: {
+          tooltip: {
+            start: "Clique para começar a desenhar.",
+            cont: "Clique para continuar a desenhar.",
+            end: "Clique no primeiro ponto para finalizar.",
+          },
+        },
+        simpleshape: {
+          tooltip: {
+            end: "Solte o mouse para terminar de desenhar.",
+          },
+        },
+      };
+
+      L.drawLocal.edit = {
+        toolbar: {
+          actions: {
+            save: {
+              title: "Salvar Mudanças",
+              text: "Salvar",
+            },
+            cancel: {
+              title: "Cancelar edição e desfazer mudanças",
+              text: "Cancelar",
+            },
+            clearAll: {
+              title: "Limpar tudo",
+              text: "Limpar tudo",
+            },
+          },
+          buttons: {
+            edit: "Editar Layers",
+            editDisabled: "Sem Layers para edição",
+            remove: "Deletar Layers",
+            removeDisabled: "Sem Layers para deleção",
+          },
+        },
+        handlers: {
+          edit: {
+            tooltip: {
+              text: "Arraste pontas para editar recursos.",
+              subtext: "Clique para cancelar mudanças",
+            },
+          },
+          remove: {
+            tooltip: {
+              text: "Clique para remover.",
+            },
+          },
+        },
+      };
+
       let vm = this;
 
       map.on(L.Draw.Event.CREATED, function (e) {
