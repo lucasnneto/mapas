@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <v-main>
-      <div class="d-flex justify-space-around">
+      <mapa :telha="telhas[2]" :center="center" height="500px" />
+
+      <!-- <div class="d-flex justify-space-around">
         <l-map
           style="height: 500px; z-index: 0"
           :zoom="zoom"
@@ -44,7 +46,7 @@
             <td>{{ item.cor }}</td>
           </tr>
         </tbody>
-      </v-simple-table>
+      </v-simple-table> -->
 
       <v-dialog v-model="dialog" persistent max-width="450">
         <v-card>
@@ -135,211 +137,213 @@
 </template>
 
 <script>
-import L from "leaflet";
-import "leaflet-draw";
-import { LMap, LTileLayer, LControlLayers } from "vue2-leaflet";
+// import L from "leaflet";
+// import "leaflet-draw";
+// import { LMap, LTileLayer, LControlLayers } from "vue2-leaflet";
+import mapa from "./mapa.vue";
 export default {
   name: "App",
 
   components: {
-    LMap,
-    LTileLayer,
-    LControlLayers,
+    mapa,
+    // LMap,
+    // LTileLayer,
+    // LControlLayers,
   },
 
-  mounted() {
-    this.$nextTick(() => {
-      const map = this.$refs.map.mapObject;
-      var drawnItems = new L.FeatureGroup();
-      map.addLayer(drawnItems);
-      const drawControl = new window.L.Control.Draw({
-        position: "topright",
-        edit: {
-          featureGroup: drawnItems,
-          edit: {},
-        },
-        draw: {
-          polygon: {
-            allowIntersection: false,
-            showArea: true,
-            metric: true,
-            feet: false,
-          },
-          polyline: false,
-          rectangle: false,
-          circle: false,
-          circlemarker: false,
-          marker: false,
-        },
-      });
+  // mounted() {
+  //   this.$nextTick(() => {
+  //     const map = this.$refs.map.mapObject;
+  //     var drawnItems = new L.FeatureGroup();
+  //     map.addLayer(drawnItems);
+  //     const drawControl = new window.L.Control.Draw({
+  //       position: "topright",
+  //       edit: {
+  //         featureGroup: drawnItems,
+  //         edit: {},
+  //       },
+  //       draw: {
+  //         polygon: {
+  //           allowIntersection: false,
+  //           showArea: true,
+  //           metric: true,
+  //           feet: false,
+  //         },
+  //         polyline: false,
+  //         rectangle: false,
+  //         circle: false,
+  //         circlemarker: false,
+  //         marker: false,
+  //       },
+  //     });
 
-      map.addControl(drawControl);
-      //
-      //https://stackoverflow.com/questions/48661724/leaflet-draw-edit-control-custom-text
-      //
-      L.drawLocal.draw.toolbar = {
-        actions: {
-          title: "Cancelar",
-          text: "Cancelar",
-        },
-        finish: {
-          title: "Finalizar",
-          text: "Finalizar",
-        },
-        undo: {
-          title: "Desfazer",
-          text: "Desfazer ultimo ponto",
-        },
-        buttons: {
-          polygon: "Desenhar um polígono",
-        },
-      };
-      L.drawLocal.draw.handlers = {
-        polygon: {
-          tooltip: {
-            start: "Clique para começar a desenhar.",
-            cont: "Clique para continuar a desenhar.",
-            end: "Clique no primeiro ponto para finalizar.",
-          },
-        },
-        simpleshape: {
-          tooltip: {
-            end: "Solte o mouse para terminar de desenhar.",
-          },
-        },
-      };
+  //     map.addControl(drawControl);
+  //     //
+  //     //https://stackoverflow.com/questions/48661724/leaflet-draw-edit-control-custom-text
+  //     //
+  //     L.drawLocal.draw.toolbar = {
+  //       actions: {
+  //         title: "Cancelar",
+  //         text: "Cancelar",
+  //       },
+  //       finish: {
+  //         title: "Finalizar",
+  //         text: "Finalizar",
+  //       },
+  //       undo: {
+  //         title: "Desfazer",
+  //         text: "Desfazer ultimo ponto",
+  //       },
+  //       buttons: {
+  //         polygon: "Desenhar um polígono",
+  //       },
+  //     };
+  //     L.drawLocal.draw.handlers = {
+  //       polygon: {
+  //         tooltip: {
+  //           start: "Clique para começar a desenhar.",
+  //           cont: "Clique para continuar a desenhar.",
+  //           end: "Clique no primeiro ponto para finalizar.",
+  //         },
+  //       },
+  //       simpleshape: {
+  //         tooltip: {
+  //           end: "Solte o mouse para terminar de desenhar.",
+  //         },
+  //       },
+  //     };
 
-      L.drawLocal.edit = {
-        toolbar: {
-          actions: {
-            save: {
-              title: "Salvar Mudanças",
-              text: "Salvar",
-            },
-            cancel: {
-              title: "Cancelar edição e desfazer mudanças",
-              text: "Cancelar",
-            },
-            clearAll: {
-              title: "Limpar tudo",
-              text: "Limpar tudo",
-            },
-          },
-          buttons: {
-            edit: "Editar Layers",
-            editDisabled: "Sem Layers para edição",
-            remove: "Deletar Layers",
-            removeDisabled: "Sem Layers para deleção",
-          },
-        },
-        handlers: {
-          edit: {
-            tooltip: {
-              text: "Arraste pontas para editar recursos.",
-              subtext: "Clique para cancelar mudanças",
-            },
-          },
-          remove: {
-            tooltip: {
-              text: "Clique para remover.",
-            },
-          },
-        },
-      };
+  //     L.drawLocal.edit = {
+  //       toolbar: {
+  //         actions: {
+  //           save: {
+  //             title: "Salvar Mudanças",
+  //             text: "Salvar",
+  //           },
+  //           cancel: {
+  //             title: "Cancelar edição e desfazer mudanças",
+  //             text: "Cancelar",
+  //           },
+  //           clearAll: {
+  //             title: "Limpar tudo",
+  //             text: "Limpar tudo",
+  //           },
+  //         },
+  //         buttons: {
+  //           edit: "Editar Layers",
+  //           editDisabled: "Sem Layers para edição",
+  //           remove: "Deletar Layers",
+  //           removeDisabled: "Sem Layers para deleção",
+  //         },
+  //       },
+  //       handlers: {
+  //         edit: {
+  //           tooltip: {
+  //             text: "Arraste pontas para editar recursos.",
+  //             subtext: "Clique para cancelar mudanças",
+  //           },
+  //         },
+  //         remove: {
+  //           tooltip: {
+  //             text: "Clique para remover.",
+  //           },
+  //         },
+  //       },
+  //     };
 
-      let vm = this;
+  //     let vm = this;
 
-      map.on(L.Draw.Event.CREATED, function (e) {
-        var layer = e.layer;
-        drawnItems.addLayer(layer);
-        layer.on("click", (e) => {
-          if (!vm.deletable) {
-            const index = vm.polygon.findIndex((el) => {
-              return el.id == e.target._leaflet_id;
-            });
-            if (index != -1) {
-              if (!vm.editable) {
-                vm.select(vm.polygon[index]);
-                vm.dialog2 = true;
-              } else {
-                vm.item = vm.polygon[index];
-                vm.layers = drawnItems._leaflet_id;
-                vm.dialog = true;
-              }
-            }
-          }
-        });
-        vm.polygon.push({
-          id: layer._leaflet_id,
-          nome: `Area ${vm.polygon.length}`,
-          latlng: layer.getLatLngs()[0],
-          area: L.GeometryUtil.formattedNumber(
-            L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]),
-            2
-          ),
-          cor: layer.options.color,
-        });
-        vm.item = vm.polygon[vm.polygon.length - 1];
-        vm.layers = drawnItems._leaflet_id;
-        vm.dialog = true;
-      });
-      map.on("draw:editstart", function () {
-        vm.editable = true;
-        vm.deletable = false;
-      });
-      map.on("draw:editstop", function () {
-        vm.polygon.forEach((e) => {
-          vm.$refs.map.mapObject._layers[e.id].setStyle({
-            color: e.cor,
-          });
-        });
-        vm.editable = false;
-        vm.deletable = false;
-      });
-      map.on("draw:deletestop", function () {
-        vm.editable = false;
-        vm.deletable = false;
-      });
-      map.on("draw:deletestart", function () {
-        vm.editable = false;
-        vm.deletable = true;
-      });
-      map.on("draw:edited", function (e) {
-        vm.editable = false;
-        var layers = e.layers;
-        layers.eachLayer(function (layer) {
-          const index = vm.polygon.findIndex((el) => {
-            return el.id == layer._leaflet_id;
-          });
-          if (index != -1) {
-            vm.polygon.splice(index, 1, {
-              id: layer._leaflet_id,
-              nome: `Area ${vm.polygon.length}`,
-              latlng: layer.getLatLngs()[0],
-              area: L.GeometryUtil.formattedNumber(
-                L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]),
-                2
-              ),
-              cor: layer.options.color,
-            });
-          }
-        });
-      });
+  //     map.on(L.Draw.Event.CREATED, function (e) {
+  //       var layer = e.layer;
+  //       drawnItems.addLayer(layer);
+  //       layer.on("click", (e) => {
+  //         if (!vm.deletable) {
+  //           const index = vm.polygon.findIndex((el) => {
+  //             return el.id == e.target._leaflet_id;
+  //           });
+  //           if (index != -1) {
+  //             if (!vm.editable) {
+  //               vm.select(vm.polygon[index]);
+  //               vm.dialog2 = true;
+  //             } else {
+  //               vm.item = vm.polygon[index];
+  //               vm.layers = drawnItems._leaflet_id;
+  //               vm.dialog = true;
+  //             }
+  //           }
+  //         }
+  //       });
+  //       vm.polygon.push({
+  //         id: layer._leaflet_id,
+  //         nome: `Area ${vm.polygon.length}`,
+  //         latlng: layer.getLatLngs()[0],
+  //         area: L.GeometryUtil.formattedNumber(
+  //           L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]),
+  //           2
+  //         ),
+  //         cor: layer.options.color,
+  //       });
+  //       vm.item = vm.polygon[vm.polygon.length - 1];
+  //       vm.layers = drawnItems._leaflet_id;
+  //       vm.dialog = true;
+  //     });
+  //     map.on("draw:editstart", function () {
+  //       vm.editable = true;
+  //       vm.deletable = false;
+  //     });
+  //     map.on("draw:editstop", function () {
+  //       vm.polygon.forEach((e) => {
+  //         vm.$refs.map.mapObject._layers[e.id].setStyle({
+  //           color: e.cor,
+  //         });
+  //       });
+  //       vm.editable = false;
+  //       vm.deletable = false;
+  //     });
+  //     map.on("draw:deletestop", function () {
+  //       vm.editable = false;
+  //       vm.deletable = false;
+  //     });
+  //     map.on("draw:deletestart", function () {
+  //       vm.editable = false;
+  //       vm.deletable = true;
+  //     });
+  //     map.on("draw:edited", function (e) {
+  //       vm.editable = false;
+  //       var layers = e.layers;
+  //       layers.eachLayer(function (layer) {
+  //         const index = vm.polygon.findIndex((el) => {
+  //           return el.id == layer._leaflet_id;
+  //         });
+  //         if (index != -1) {
+  //           vm.polygon.splice(index, 1, {
+  //             id: layer._leaflet_id,
+  //             nome: `Area ${vm.polygon.length}`,
+  //             latlng: layer.getLatLngs()[0],
+  //             area: L.GeometryUtil.formattedNumber(
+  //               L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]),
+  //               2
+  //             ),
+  //             cor: layer.options.color,
+  //           });
+  //         }
+  //       });
+  //     });
 
-      map.on("draw:deleted", function (e) {
-        vm.deletable = false;
-        var layers = e.layers;
-        layers.eachLayer(function (layer) {
-          const index = vm.polygon.findIndex((el) => {
-            return el.id == layer._leaflet_id;
-          });
-          if (index != -1) {
-            vm.polygon.splice(index, 1);
-          }
-        });
-      });
-    });
-  },
+  //     map.on("draw:deleted", function (e) {
+  //       vm.deletable = false;
+  //       var layers = e.layers;
+  //       layers.eachLayer(function (layer) {
+  //         const index = vm.polygon.findIndex((el) => {
+  //           return el.id == layer._leaflet_id;
+  //         });
+  //         if (index != -1) {
+  //           vm.polygon.splice(index, 1);
+  //         }
+  //       });
+  //     });
+  //   });
+  // },
 
   data: () => ({
     telhas: [
