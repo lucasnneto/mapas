@@ -1,7 +1,17 @@
 <template>
   <v-app>
     <v-main>
-      <mapa :telha="telhas[2]" :center="center" height="500px" />
+      <v-btn @click="newPolygon(1)">Adicionar</v-btn>
+      <v-btn @click="newPolygon(2)">Adicionar Talhão</v-btn>
+      <mapa
+        @layer="Layer"
+        :telha="telhas[0]"
+        :center="center"
+        height="500px"
+        :createPolygon.sync="createPoli"
+        :createSubPolygon.sync="createPoli2"
+        edit
+      />
 
       <!-- <div class="d-flex justify-space-around">
         <l-map
@@ -377,8 +387,17 @@ export default {
     editable: false,
     deletable: false,
     layersid: 0,
+    createPoli: false,
+    createPoli2: false,
   }),
   methods: {
+    Layer(e) {
+      console.log(e);
+    },
+    newPolygon(t) {
+      if (t == 1) this.createPoli = !this.createPoli;
+      else this.createPoli2 = !this.createPoli2;
+    },
     select(item) {
       this.selecionado = item;
     },
