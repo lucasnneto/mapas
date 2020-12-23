@@ -114,7 +114,6 @@ export default {
         position: "bottomright",
         edit: {
           featureGroup: drawnItems,
-          remove: false,
         },
         draw: {
           polygon: false,
@@ -178,10 +177,26 @@ export default {
 .leaflet-touch .leaflet-bar {
   border: none !important;
 }
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  border-bottom: 0px !important;
+}
 .leaflet-draw-toolbar .leaflet-draw-edit-edit {
-  border-radius: 4px !important;
+  border: 0px;
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
   background: rgba(38, 51, 87, 0.5) !important;
   background-image: url(./assets/edit.svg) !important;
+  width: 25px !important;
+  height: 25px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+.leaflet-draw-toolbar .leaflet-draw-edit-remove {
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  background: rgba(38, 51, 87, 0.5) !important;
+  background-image: url(./assets/delete.svg) !important;
   width: 25px !important;
   height: 25px !important;
   background-repeat: no-repeat !important;
