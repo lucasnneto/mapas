@@ -1,17 +1,151 @@
 <template>
   <v-app>
     <v-main>
-      <v-btn @click="newPolygon(1)">Adicionar</v-btn>
-      <v-btn @click="newPolygon(2)">Adicionar Talhão</v-btn>
-      <mapa
-        @layer="Layer"
-        :telha="telhas[0]"
-        :center="center"
-        height="500px"
-        :createPolygon.sync="createPoli"
-        :createSubPolygon.sync="createPoli2"
-        edit
-      />
+      <div class="mt-4 mx-6">
+        <div class="d-flex justify-space-between">
+          <h2 class="font-weight-bold">Fazenda Olhos d’Água</h2>
+          <v-btn @click="newPolygon(1)" outlined>Adicionar</v-btn>
+        </div>
+        <v-row>
+          <v-col>
+            <mapa
+              @layer="Layer"
+              :telha="telhas[0]"
+              :center="center"
+              height="500px"
+              :createPolygon.sync="createPoli"
+              :createSubPolygon.sync="createPoli2"
+              edit
+            />
+          </v-col>
+          <v-col>
+            <div class="d-flex align-center mb-4">
+              <h3 class="mr-6">Informações</h3>
+              <v-btn outlined small icon tile class="rounded" color="blue"
+                ><v-icon>mdi-plus</v-icon></v-btn
+              >
+            </div>
+            <div class="d-flex justify-start mb-4">
+              <div class="mr-6">
+                <span class="body-2 font-font-weight-medium">Área Total</span>
+                <div>
+                  <span class="body-3">547,21 </span
+                  ><span class="body-2 font-font-weight-medium">ha</span>
+                </div>
+              </div>
+              <div class="mr-6">
+                <span class="body-2 font-font-weight-medium"
+                  >Área Consolidada</span
+                >
+                <div>
+                  <span class="body-3">435 </span
+                  ><span class="body-2 font-font-weight-medium">ha</span>
+                </div>
+              </div>
+              <div>
+                <span class="body-2 font-font-weight-medium">Reserva</span>
+                <div>
+                  <span class="body-3">112,21 </span
+                  ><span class="body-2 font-font-weight-medium">ha</span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-start mb-4">
+              <div class="mr-6 d-flex flex-column">
+                <span class="body-2 font-font-weight-medium">Matrícula</span>
+                <span class="body-3">27.002</span>
+                <span class="body-3">209234</span>
+              </div>
+              <div class="mr-6 d-flex flex-column">
+                <div>
+                  <span class="body-2 font-font-weight-medium"
+                    >Núm. INCRA
+                  </span>
+                  <v-btn icon x-small
+                    ><v-img
+                      class="ml-2"
+                      x-small
+                      height="16px"
+                      width="14px"
+                      src="@/assets/download.svg"
+                    >
+                    </v-img
+                  ></v-btn>
+                </div>
+                <v-icon></v-icon>
+                <span class="body-3">4141230105453</span>
+                <span class="body-3">4141230132507</span>
+              </div>
+              <div class="mr-6 d-flex flex-column">
+                <div>
+                  <span class="body-2 font-font-weight-medium">NIRF</span>
+                  <v-btn icon x-small
+                    ><v-img
+                      class="ml-2"
+                      x-small
+                      height="16px"
+                      width="14px"
+                      src="@/assets/download.svg"
+                    >
+                    </v-img
+                  ></v-btn>
+                </div>
+                <span class="body-3">12345678900</span>
+              </div>
+            </div>
+            <div class="d-flex flex-column justify-start mb-4">
+              <div class="d-flex align-center">
+                <span class="body-2 font-font-weight-medium">CAR</span>
+                <v-btn icon x-small
+                  ><v-img
+                    class="ml-2"
+                    x-small
+                    height="16px"
+                    width="14px"
+                    src="@/assets/download.svg"
+                  >
+                  </v-img
+                ></v-btn>
+              </div>
+              <span class="body-3"
+                >UF-1231234-1234.1234.1234.1234.1234.1234.1234.1234</span
+              >
+            </div>
+            <div class="d-flex align-center mb-4">
+              <h3 class="mr-6">Talhão</h3>
+              <v-btn
+                @click="newPolygon(2)"
+                outlined
+                small
+                icon
+                tile
+                class="rounded"
+                color="blue"
+                ><v-icon>mdi-plus</v-icon></v-btn
+              >
+            </div>
+            <div class="d-flex align-center mb-4">
+              <v-data-table
+                dense
+                :headers="headers"
+                :items="items"
+                item-key="id"
+                hide-default-footer
+                style="width: 100%"
+              >
+                <template v-slot:[`item.detalhes`]="{}">
+                  <span
+                    class="blue--text"
+                    style="cursor: pointer"
+                    @click="() => {}"
+                    >Detalhes
+                  </span>
+                </template>
+              </v-data-table>
+            </div>
+          </v-col>
+        </v-row>
+      </div>
 
       <!-- <div class="d-flex justify-space-around">
         <l-map
@@ -356,6 +490,24 @@ export default {
   // },
 
   data: () => ({
+    headers: [
+      { text: "Cultura", value: "cultura", sortable: false },
+      { text: "Área", value: "area", sortable: false },
+      { text: "Safra", value: "safra", sortable: false },
+      { text: "", value: "detalhes", sortable: false, align: "end" },
+    ],
+    items: [
+      {
+        cultura: "Soja",
+        area: "152,45 ha",
+        safra: "20/21",
+      },
+      {
+        cultura: "Soja",
+        area: "152,45 ha",
+        safra: "20/21",
+      },
+    ],
     telhas: [
       {
         name: "OpenStreetMap",

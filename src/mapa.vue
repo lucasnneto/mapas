@@ -95,7 +95,6 @@ export default {
       // new L.Draw.Polygon(this.map, this.drawControl.options.polygon).disable();
     },
     createSubPolygon() {
-      console.log(".");
       if (this.subpolygon == null) {
         //https://stackoverflow.com/questions/15775103/leaflet-draw-mapping-how-to-initiate-the-draw-function-without-toolbar
         this.subpolygon = new L.Draw.Polygon(
@@ -107,50 +106,47 @@ export default {
     },
   },
   mounted() {
-    if (this.edit) {
-      this.$nextTick(() => {
-        this.map = this.$refs.map.mapObject;
-        var drawnItems = new L.FeatureGroup();
-        this.map.addLayer(drawnItems);
-        this.drawControl = new window.L.Control.Draw({
-          position: "bottomright",
-          edit: {
-            featureGroup: drawnItems,
-            remove: false,
-          },
-          draw: {
-            polygon: false,
-            // polygon: {
-            //   allowIntersection: false,
-            //   showArea: true,
-            //   metric: true,
-            //   feet: false,
-            // },
-            polyline: false,
-            rectangle: false,
-            circle: false,
-            circlemarker: false,
-            marker: false,
-          },
-        });
-
-        this.map.addControl(this.drawControl);
-        this.map.on("draw:created", (e) => {
-          var layer = e.layer;
-          this.$emit("layer", layer);
-          if (this.polygon != null)
-            layer.setStyle({ color: "#ff0000", opacity: 0.8, fillOpacity: 0 });
-          if (this.subpolygon != null) layer.setStyle({ color: "#ffff00" });
-          drawnItems.addLayer(layer);
-          this.polygon = null;
-          this.subpolygon = null;
-        });
-        this.map.on("draw:edited", (e) => {
-          var layers = e.layers;
-          this.$emit("layer", layers);
-        });
+    this.$nextTick(() => {
+      this.map = this.$refs.map.mapObject;
+      var drawnItems = new L.FeatureGroup();
+      this.map.addLayer(drawnItems);
+      this.drawControl = new window.L.Control.Draw({
+        position: "bottomright",
+        edit: {
+          featureGroup: drawnItems,
+          remove: false,
+        },
+        draw: {
+          polygon: false,
+          // polygon: {
+          //   allowIntersection: false,
+          //   showArea: true,
+          //   metric: true,
+          //   feet: false,
+          // },
+          polyline: false,
+          rectangle: false,
+          circle: false,
+          circlemarker: false,
+          marker: false,
+        },
       });
-    }
+      if (this.edit) this.map.addControl(this.drawControl);
+      this.map.on("draw:created", (e) => {
+        var layer = e.layer;
+        this.$emit("layer", layer);
+        if (this.polygon != null)
+          layer.setStyle({ color: "#ff0000", opacity: 0.8, fillOpacity: 0 });
+        if (this.subpolygon != null) layer.setStyle({ color: "#ffff00" });
+        drawnItems.addLayer(layer);
+        this.polygon = null;
+        this.subpolygon = null;
+      });
+      this.map.on("draw:edited", (e) => {
+        var layers = e.layers;
+        this.$emit("layer", layers);
+      });
+    });
   },
 };
 </script>
