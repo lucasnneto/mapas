@@ -162,7 +162,7 @@ export default {
   background: rgba(38, 51, 87, 0.5);
 }
 .leaflet-bar a.leaflet-disabled {
-  background-color: none;
+  background-color: rgba(38, 51, 87, 0.5) !important;
 }
 .leaflet-touch .leaflet-control-zoom-in,
 .leaflet-touch .leaflet-control-zoom-in:hover {
