@@ -10,13 +10,13 @@
           <v-col>
             <mapa
               @layer="Layer"
-              :telha="telhas[0]"
+              :telha="telhas[1]"
               :center="center"
               height="500px"
-              :createPolygon.sync="createPoli"
-              :createSubPolygon.sync="createPoli2"
-              edit
             />
+            <!-- :createPolygon.sync="createPoli"
+              :createSubPolygon.sync="createPoli2"
+              edit -->
           </v-col>
           <v-col>
             <div class="d-flex align-center mb-4">
@@ -276,6 +276,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <modal dialog />
     </v-main>
   </v-app>
 </template>
@@ -284,12 +285,14 @@
 // import L from "leaflet";
 // import "leaflet-draw";
 // import { LMap, LTileLayer, LControlLayers } from "vue2-leaflet";
+import modal from "./modal.vue";
 import mapa from "./mapa.vue";
 export default {
   name: "App",
 
   components: {
     mapa,
+    modal,
     // LMap,
     // LTileLayer,
     // LControlLayers,
@@ -518,7 +521,7 @@ export default {
         name: "Toner",
         visible: false,
         url:
-          "https://api.maptiler.com/maps/toner/{z}/{x}/{y}.png?key=Y7PaX0PVfTePQJc5eDua",
+          "https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=Y7PaX0PVfTePQJc5eDua",
       },
       {
         name: "Dark",
@@ -529,7 +532,7 @@ export default {
     ],
 
     zoom: 16,
-    center: [-19.7532845, -47.9363265],
+    center: [-17.2633538, -46.8111499],
     polygon: [],
     selecionado: {},
     dialog: false,

@@ -1,8 +1,8 @@
 <template>
   <div>
     <l-map
-      style="height: 100vh; z-index: 0"
-      :style="{ height: height + '!important' }"
+      style="height: 100vh; z-index: 0; width: 80vh border-radius: 8px"
+      :style="{ height: height + '!important', width: width + '!important' }"
       :zoom="zoom"
       :center="center"
       :options="{ zoomControl: false, attributionControl: false }"
@@ -35,7 +35,14 @@ export default {
     LTileLayer,
     LControlZoom,
   },
+  //TODO RECEBER OBJETO DE ÁREA PRÉ-PRONTO
   props: {
+    polygons: {
+      type: Array,
+      default: () => {
+        return [];
+      },
+    },
     zoom: {
       type: Number,
       default: 15,
@@ -51,6 +58,7 @@ export default {
       required: true,
     },
     height: String,
+    width: String,
     zoomControl: {
       type: [Array, Object],
       default() {
@@ -78,11 +86,19 @@ export default {
     return {
       map: {},
       drawControl: {},
+      drawnItems: {},
       polygon: null,
       subpolygon: null,
     };
   },
   watch: {
+    // polygons() {
+    //   this.polygons.forEach((e) => {
+    //     console.log(e);
+    //     var polygon = L.polygon(e.latlngs, { color: e.cor });
+    //     this.drawnItems.addLayer(polygon);
+    //   });
+    // },
     createPolygon() {
       if (this.polygon == null) {
         //https://stackoverflow.com/questions/15775103/leaflet-draw-mapping-how-to-initiate-the-draw-function-without-toolbar
@@ -108,12 +124,12 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.map = this.$refs.map.mapObject;
-      var drawnItems = new L.FeatureGroup();
-      this.map.addLayer(drawnItems);
+      this.drawnItems = new L.FeatureGroup();
+      this.map.addLayer(this.drawnItems);
       this.drawControl = new window.L.Control.Draw({
-        position: "bottomright",
+        position: this.zoomControl.position,
         edit: {
-          featureGroup: drawnItems,
+          featureGroup: this.drawnItems,
         },
         draw: {
           polygon: false,
@@ -130,6 +146,55 @@ export default {
           marker: false,
         },
       });
+      L.drawLocal.draw.handlers.polygon = {
+        tooltip: {
+          start: "Clique para começar a desenhar.",
+          cont: "Clique para continuar a desenhar.",
+          end: "Clique no primeiro ponto para finalizar.",
+        },
+      };
+      (L.drawLocal.draw.handlers.simpleshape = {
+        tooltip: {
+          end: "Solte o mouse para terminar de desenhar.",
+        },
+      }),
+        (L.drawLocal.edit = {
+          toolbar: {
+            actions: {
+              save: {
+                title: "Salvar Mudanças",
+                text: "Salvar",
+              },
+              cancel: {
+                title: "Cancelar edição e desfazer mudanças",
+                text: "Cancelar",
+              },
+              clearAll: {
+                title: "Limpar tudo",
+                text: "Limpar tudo",
+              },
+            },
+            buttons: {
+              edit: "Editar Layers",
+              editDisabled: "Sem Layers para edição",
+              remove: "Deletar Layers",
+              removeDisabled: "Sem Layers para deleção",
+            },
+          },
+          handlers: {
+            edit: {
+              tooltip: {
+                text: "Arraste pontas para editar recursos.",
+                subtext: "Clique para cancelar mudanças",
+              },
+            },
+            remove: {
+              tooltip: {
+                text: "Clique para remover.",
+              },
+            },
+          },
+        });
       if (this.edit) this.map.addControl(this.drawControl);
       this.map.on("draw:created", (e) => {
         var layer = e.layer;
@@ -137,7 +202,7 @@ export default {
         if (this.polygon != null)
           layer.setStyle({ color: "#ff0000", opacity: 0.8, fillOpacity: 0 });
         if (this.subpolygon != null) layer.setStyle({ color: "#ffff00" });
-        drawnItems.addLayer(layer);
+        this.drawnItems.addLayer(layer);
         this.polygon = null;
         this.subpolygon = null;
       });
@@ -145,12 +210,17 @@ export default {
         var layers = e.layers;
         this.$emit("layer", layers);
       });
+      this.polygons.forEach((e) => {
+        var polygon = L.polygon(e.latlngs, { color: e.cor });
+        this.drawnItems.addLayer(polygon);
+      });
     });
   },
 };
 </script>
 
 <style>
+/*TODO Limpar CSS */
 .leaflet-control-zoom {
   border: none;
   border-radius: 4px !important;
@@ -201,5 +271,8 @@ export default {
   height: 25px !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
+}
+ul.leaflet-draw-actions li a {
+  color: white;
 }
 </style>
