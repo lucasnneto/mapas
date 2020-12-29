@@ -4,12 +4,14 @@
       <div class="mt-4 mx-6">
         <div class="d-flex justify-space-between">
           <h2 class="font-weight-bold">Fazenda Olhos d’Água</h2>
-          <v-btn @click="newPolygon(1)" outlined>Adicionar</v-btn>
+          <v-btn outlined>Adicionar</v-btn>
         </div>
         <v-row>
           <v-col>
             <mapa
+              :polygons.sync="lista"
               @layer="Layer"
+              :zoom="13"
               :telha="telhas[1]"
               :center="center"
               height="500px"
@@ -21,7 +23,14 @@
           <v-col>
             <div class="d-flex align-center mb-4">
               <h3 class="mr-6">Informações</h3>
-              <v-btn outlined small icon tile class="rounded" color="blue"
+              <v-btn
+                outlined
+                small
+                icon
+                tile
+                class="rounded"
+                color="blue"
+                @click="edit(1)"
                 ><v-icon>mdi-plus</v-icon></v-btn
               >
             </div>
@@ -114,7 +123,7 @@
             <div class="d-flex align-center mb-4">
               <h3 class="mr-6">Talhão</h3>
               <v-btn
-                @click="newPolygon(2)"
+                @click="edit(2)"
                 outlined
                 small
                 icon
@@ -128,16 +137,16 @@
               <v-data-table
                 dense
                 :headers="headers"
-                :items="items"
+                :items="talhao"
                 item-key="id"
                 hide-default-footer
                 style="width: 100%"
               >
-                <template v-slot:[`item.detalhes`]="{}">
+                <template v-slot:[`item.detalhes`]="{ item }">
                   <span
                     class="blue--text"
                     style="cursor: pointer"
-                    @click="() => {}"
+                    @click="dtl(item)"
                     >Detalhes
                   </span>
                 </template>
@@ -276,7 +285,15 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <modal dialog />
+      <modal
+        v-if="d"
+        :dialog="d"
+        :type="type"
+        @dialog="d = false"
+        @lista="att"
+        :lista.sync="listamodal"
+      />
+      <detalhes :dialog="d2" v-if="d2" :dados="dados" @dialog="d2 = false" />
     </v-main>
   </v-app>
 </template>
@@ -286,13 +303,21 @@
 // import "leaflet-draw";
 // import { LMap, LTileLayer, LControlLayers } from "vue2-leaflet";
 import modal from "./modal.vue";
+import detalhes from "./detalhes.vue";
 import mapa from "./mapa.vue";
 export default {
   name: "App",
-
+  computed: {
+    talhao() {
+      return this.lista.filter((e) => {
+        return e.type == "TALHAO";
+      });
+    },
+  },
   components: {
     mapa,
     modal,
+    detalhes,
     // LMap,
     // LTileLayer,
     // LControlLayers,
@@ -494,7 +519,7 @@ export default {
 
   data: () => ({
     headers: [
-      { text: "Cultura", value: "cultura", sortable: false },
+      { text: "Cultura", value: "name", sortable: false },
       { text: "Área", value: "area", sortable: false },
       { text: "Safra", value: "safra", sortable: false },
       { text: "", value: "detalhes", sortable: false, align: "end" },
@@ -532,7 +557,7 @@ export default {
     ],
 
     zoom: 16,
-    center: [-17.2633538, -46.8111499],
+    center: [-17.2633538, -46.8311499],
     polygon: [],
     selecionado: {},
     dialog: false,
@@ -544,6 +569,12 @@ export default {
     layersid: 0,
     createPoli: false,
     createPoli2: false,
+    type: "",
+    lista: [],
+    listamodal: [],
+    d: false,
+    d2: false,
+    dados: {},
   }),
   methods: {
     Layer(e) {
@@ -571,6 +602,30 @@ export default {
         this.select(this.polygon[index]);
         this.dialog2 = true;
       }
+    },
+    edit(a) {
+      if (a == 1) {
+        this.type = "TERRENO";
+        this.listamodal = this.lista.filter((e) => {
+          return e.type == "TERRENO";
+        });
+      } else {
+        this.type = "TALHAO";
+        this.listamodal = this.lista.filter((e) => {
+          return e.type == "TALHAO";
+        });
+      }
+      this.d = true;
+    },
+    att(e) {
+      this.lista = this.lista.filter((el) => {
+        return el.type != this.type;
+      });
+      this.lista = this.lista.concat(e);
+    },
+    dtl(item) {
+      this.dados = item;
+      this.d2 = true;
     },
   },
 };

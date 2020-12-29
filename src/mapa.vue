@@ -1,7 +1,12 @@
 <template>
   <div>
     <l-map
-      style="height: 100vh; z-index: 0; width: 80vh border-radius: 8px"
+      style="
+        height: 100vh;
+        z-index: 0;
+        width: 80vh;
+        border-radius: 6px !important;
+      "
       :style="{ height: height + '!important', width: width + '!important' }"
       :zoom="zoom"
       :center="center"
@@ -35,7 +40,6 @@ export default {
     LTileLayer,
     LControlZoom,
   },
-  //TODO RECEBER OBJETO DE ÁREA PRÉ-PRONTO
   props: {
     polygons: {
       type: Array,
@@ -74,12 +78,16 @@ export default {
       default: false,
     },
     createPolygon: {
-      type: Boolean,
-      default: false,
+      type: Object,
+      default: () => {
+        return {};
+      },
     },
     createSubPolygon: {
-      type: Boolean,
-      default: false,
+      type: Object,
+      default: () => {
+        return {};
+      },
     },
   },
   data() {
@@ -89,35 +97,86 @@ export default {
       drawnItems: {},
       polygon: null,
       subpolygon: null,
+      lista: [],
+      item: {},
+      deletable: false,
     };
   },
   watch: {
-    // polygons() {
-    //   this.polygons.forEach((e) => {
-    //     console.log(e);
-    //     var polygon = L.polygon(e.latlngs, { color: e.cor });
-    //     this.drawnItems.addLayer(polygon);
-    //   });
-    // },
-    createPolygon() {
-      if (this.polygon == null) {
-        //https://stackoverflow.com/questions/15775103/leaflet-draw-mapping-how-to-initiate-the-draw-function-without-toolbar
-        this.polygon = new L.Draw.Polygon(
-          this.map,
-          this.drawControl.options.polygon
-        );
-        this.polygon.enable();
-      }
-      // new L.Draw.Polygon(this.map, this.drawControl.options.polygon).disable();
+    polygons() {
+      this.polygons.forEach((e) => {
+        var polygon = L.polygon(e.latlngs, {
+          color: e.cor,
+          opacity: e.type == "TERRENO" ? 0.8 : 0.5,
+          fillOpacity: e.type == "TERRENO" ? 0 : 0.2,
+        });
+        polygon.addTo(this.drawnItems);
+        //   const a = {
+        //     ...e,
+        //     id: layer._leaflet_id,
+        //     cor: layer.options.color,
+        //     area: L.GeometryUtil.formattedNumber(
+        //       L.GeometryUtil.geodesicArea(layer._latlngs[0]),
+        //       2
+        //     ),
+        //   };
+        //   this.lista.push(a);
+        //   this.$emit("lista", this.lista);
+        //   polygon.on("click", (e) => {
+        //     if (!this.deletable) {
+        //       const index = this.lista.findIndex((el) => {
+        //         return el.id == e.target._leaflet_id;
+        //       });
+        //       if (index != -1) {
+        //         this.$emit("clickPolygon", this.lista[index]);
+        //       }
+        //     }
+        //   });
+      });
     },
-    createSubPolygon() {
-      if (this.subpolygon == null) {
-        //https://stackoverflow.com/questions/15775103/leaflet-draw-mapping-how-to-initiate-the-draw-function-without-toolbar
-        this.subpolygon = new L.Draw.Polygon(
-          this.map,
-          this.drawControl.options.polygon
-        );
-        this.subpolygon.enable();
+    createPolygon(item) {
+      this.item = item;
+      if (item.id == "" || item.id == undefined) {
+        if (this.polygon == null) {
+          //https://stackoverflow.com/questions/15775103/leaflet-draw-mapping-how-to-initiate-the-draw-function-without-toolbar
+          this.polygon = new L.Draw.Polygon(
+            this.map,
+            this.drawControl.options.polygon
+          );
+          this.polygon.enable();
+        }
+        // new L.Draw.Polygon(this.map, this.drawControl.options.polygon).disable();
+      } else {
+        this.lista = this.lista.map((e) => {
+          if (e.id == this.item.id) return this.item;
+          else return e;
+        });
+        this.$refs.map.mapObject._layers[this.item.id].setStyle({
+          color: this.item.cor,
+        });
+        this.$emit("lista", this.lista);
+      }
+    },
+    createSubPolygon(item) {
+      this.item = item;
+      if (item.id == "" || item.id == undefined) {
+        if (this.subpolygon == null) {
+          //https://stackoverflow.com/questions/15775103/leaflet-draw-mapping-how-to-initiate-the-draw-function-without-toolbar
+          this.subpolygon = new L.Draw.Polygon(
+            this.map,
+            this.drawControl.options.polygon
+          );
+          this.subpolygon.enable();
+        }
+      } else {
+        this.lista = this.lista.map((e) => {
+          if (e.id == this.item.id) return this.item;
+          else return e;
+        });
+        this.$refs.map.mapObject._layers[this.item.id].setStyle({
+          color: this.item.cor,
+        });
+        this.$emit("lista", this.lista);
       }
     },
   },
@@ -133,12 +192,6 @@ export default {
         },
         draw: {
           polygon: false,
-          // polygon: {
-          //   allowIntersection: false,
-          //   showArea: true,
-          //   metric: true,
-          //   feet: false,
-          // },
           polyline: false,
           rectangle: false,
           circle: false,
@@ -146,6 +199,23 @@ export default {
           marker: false,
         },
       });
+      L.drawLocal.draw.toolbar = {
+        actions: {
+          title: "Cancelar",
+          text: "Cancelar",
+        },
+        finish: {
+          title: "Finalizar",
+          text: "Finalizar",
+        },
+        undo: {
+          title: "Desfazer",
+          text: "Desfazer ultimo ponto",
+        },
+        buttons: {
+          polygon: "Desenhar um polígono",
+        },
+      };
       L.drawLocal.draw.handlers.polygon = {
         tooltip: {
           start: "Clique para começar a desenhar.",
@@ -198,21 +268,116 @@ export default {
       if (this.edit) this.map.addControl(this.drawControl);
       this.map.on("draw:created", (e) => {
         var layer = e.layer;
-        this.$emit("layer", layer);
         if (this.polygon != null)
-          layer.setStyle({ color: "#ff0000", opacity: 0.8, fillOpacity: 0 });
-        if (this.subpolygon != null) layer.setStyle({ color: "#ffff00" });
+          layer.setStyle({
+            color: this.item.cor,
+            opacity: 0.8,
+            fillOpacity: 0.0,
+          });
+        if (this.subpolygon != null) layer.setStyle({ color: this.item.cor });
         this.drawnItems.addLayer(layer);
+        const a = {
+          name: this.item.name,
+          id: layer._leaflet_id,
+          cor: layer.options.color,
+          area: L.GeometryUtil.formattedNumber(
+            L.GeometryUtil.geodesicArea(layer._latlngs[0]),
+            2
+          ),
+          latlngs: layer._latlngs[0],
+        };
+        layer.on("click", (e) => {
+          if (!this.deletable) {
+            const index = this.lista.findIndex((el) => {
+              return el.id == e.target._leaflet_id;
+            });
+            if (index != -1) {
+              this.$emit("clickPolygon", this.lista[index]);
+            }
+          }
+        });
+        this.lista.push(a);
+        this.$emit("lista", this.lista);
         this.polygon = null;
         this.subpolygon = null;
+        this.$emit("created", true);
       });
       this.map.on("draw:edited", (e) => {
         var layers = e.layers;
         this.$emit("layer", layers);
       });
+      this.map.on("draw:deletestop", () => {
+        this.deletable = false;
+      });
+      this.map.on("draw:deleted", (e) => {
+        this.deletable = false;
+        var layers = e.layers;
+        layers.eachLayer((layer) => {
+          const index = this.lista.findIndex((el) => {
+            return el.id == layer._leaflet_id;
+          });
+          if (index != -1) {
+            this.lista.splice(index, 1);
+          }
+        });
+        this.$emit("lista", this.lista);
+      });
+      this.map.on("draw:edited", (e) => {
+        this.editable = false;
+        var layers = e.layers;
+        layers.eachLayer((layer) => {
+          const index = this.lista.findIndex((el) => {
+            return el.id == layer._leaflet_id;
+          });
+          if (index != -1) {
+            const n = this.lista[index].name;
+            this.lista.splice(index, 1, {
+              id: layer._leaflet_id,
+              name: n,
+              latlngs: layer.getLatLngs()[0],
+              area: L.GeometryUtil.formattedNumber(
+                L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]),
+                2
+              ),
+              cor: layer.options.color,
+            });
+          }
+        });
+        this.$emit("lista", this.lista);
+      });
+      this.map.on("draw:deletestart", () => {
+        this.deletable = true;
+      });
       this.polygons.forEach((e) => {
-        var polygon = L.polygon(e.latlngs, { color: e.cor });
-        this.drawnItems.addLayer(polygon);
+        var polygon = L.polygon(e.latlngs, {
+          color: e.cor,
+          opacity: e.type == "TERRENO" ? 0.8 : 1,
+          fillOpacity: e.type == "TERRENO" ? 0 : 0.5,
+        });
+        const layer = polygon.addTo(this.drawnItems);
+        // this.drawnItems.addLayer(polygon);
+        // console.log(layer);
+        const a = {
+          ...e,
+          id: layer._leaflet_id,
+          cor: layer.options.color,
+          area: L.GeometryUtil.formattedNumber(
+            L.GeometryUtil.geodesicArea(layer._latlngs[0]),
+            2
+          ),
+        };
+        this.lista.push(a);
+        this.$emit("lista", this.lista);
+        polygon.on("click", (e) => {
+          if (!this.deletable) {
+            const index = this.lista.findIndex((el) => {
+              return el.id == e.target._leaflet_id;
+            });
+            if (index != -1) {
+              this.$emit("clickPolygon", this.lista[index]);
+            }
+          }
+        });
       });
     });
   },
@@ -271,6 +436,17 @@ export default {
   height: 25px !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
+}
+
+.leaflet-draw-toolbar a.leaflet-draw-draw-polygon {
+  border-radius: 4px !important;
+  background-color: rgba(38, 51, 87, 0.5) !important;
+  background-image: url(./assets/polygon.svg) !important;
+  width: 25px !important;
+  height: 25px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 300px 22px !important;
 }
 ul.leaflet-draw-actions li a {
   color: white;
