@@ -30,29 +30,31 @@
                 tile
                 class="rounded"
                 color="blue"
-                @click="edit(1)"
+                @click="edit = !edit"
                 ><v-icon>mdi-plus</v-icon></v-btn
               >
             </div>
             <div class="d-flex justify-start mb-4">
               <div class="mr-6">
-                <span class="body-2 font-font-weight-medium">Área Total</span>
+                <span class="body-2 font-font-weight-medium mb-2"
+                  >Área Total</span
+                >
                 <div>
                   <span class="body-3">547,21 </span
                   ><span class="body-2 font-font-weight-medium">ha</span>
                 </div>
               </div>
               <div class="mr-6">
-                <span class="body-2 font-font-weight-medium"
+                <span class="body-2 font-font-weight-medium mb-2"
                   >Área Consolidada</span
                 >
                 <div>
-                  <span class="body-3">435 </span
+                  <span class="body-3">{{ areaConsolidada + " " }}</span
                   ><span class="body-2 font-font-weight-medium">ha</span>
                 </div>
               </div>
               <div>
-                <span class="body-2 font-font-weight-medium">Reserva</span>
+                <span class="body-2 font-font-weight-medium mb-2">Reserva</span>
                 <div>
                   <span class="body-3">112,21 </span
                   ><span class="body-2 font-font-weight-medium">ha</span>
@@ -61,19 +63,24 @@
             </div>
             <div class="d-flex justify-start mb-4">
               <div class="mr-6 d-flex flex-column">
-                <span class="body-2 font-font-weight-medium">Matrícula</span>
-                <span class="body-3">27.002</span>
-                <span class="body-3">209234</span>
+                <span class="body-2 mb-2 font-font-weight-medium"
+                  >Matrícula</span
+                >
+                <v-text-field outlined v-if="edit"></v-text-field>
+                <div class="d-flex flex-column" v-else>
+                  <span class="body-3">27.002</span>
+                  <span class="body-3">209234</span>
+                </div>
               </div>
               <div class="mr-6 d-flex flex-column">
-                <div>
+                <div class="mb-2 d-flex">
                   <span class="body-2 font-font-weight-medium"
                     >Núm. INCRA
                   </span>
-                  <v-btn icon x-small
+                  <v-btn class="ml-2" icon x-small
                     ><v-img
-                      class="ml-2"
                       x-small
+                      class="ma-1"
                       height="16px"
                       width="14px"
                       src="@/assets/download.svg"
@@ -81,17 +88,19 @@
                     </v-img
                   ></v-btn>
                 </div>
-                <v-icon></v-icon>
-                <span class="body-3">4141230105453</span>
-                <span class="body-3">4141230132507</span>
+                <v-text-field outlined v-if="edit"></v-text-field>
+                <div v-else class="d-flex flex-column">
+                  <span class="body-3">4141230105453</span>
+                  <span class="body-3">4141230132507</span>
+                </div>
               </div>
               <div class="mr-6 d-flex flex-column">
-                <div>
+                <div class="mb-2">
                   <span class="body-2 font-font-weight-medium">NIRF</span>
-                  <v-btn icon x-small
+                  <v-btn class="ml-2" icon x-small
                     ><v-img
-                      class="ml-2"
                       x-small
+                      class="ma-1"
                       height="16px"
                       width="14px"
                       src="@/assets/download.svg"
@@ -99,16 +108,17 @@
                     </v-img
                   ></v-btn>
                 </div>
-                <span class="body-3">12345678900</span>
+                <v-text-field outlined v-if="edit"></v-text-field>
+                <span v-else class="body-3">12345678900</span>
               </div>
             </div>
             <div class="d-flex flex-column justify-start mb-4">
-              <div class="d-flex align-center">
+              <div class="d-flex align-center mb-2">
                 <span class="body-2 font-font-weight-medium">CAR</span>
-                <v-btn icon x-small
+                <v-btn class="ml-2" icon x-small
                   ><v-img
-                    class="ml-2"
                     x-small
+                    class="ma-1"
                     height="16px"
                     width="14px"
                     src="@/assets/download.svg"
@@ -116,14 +126,15 @@
                   </v-img
                 ></v-btn>
               </div>
-              <span class="body-3"
+              <v-text-field outlined v-if="edit"></v-text-field>
+              <span v-else class="body-3"
                 >UF-1231234-1234.1234.1234.1234.1234.1234.1234.1234</span
               >
             </div>
             <div class="d-flex align-center mb-4">
               <h3 class="mr-6">Talhão</h3>
               <v-btn
-                @click="edit(2)"
+                @click="editar(2)"
                 outlined
                 small
                 icon
@@ -312,6 +323,16 @@ export default {
       return this.lista.filter((e) => {
         return e.type == "TALHAO";
       });
+    },
+    areaConsolidada() {
+      if (this.talhao.length > 0) {
+        return this.talhao
+          .map((e) => Number.parseFloat(e.area))
+          .reduce((a, e) => {
+            return a + e;
+          })
+          .toFixed(2);
+      } else return 0;
     },
   },
   components: {
@@ -524,18 +545,7 @@ export default {
       { text: "Safra", value: "safra", sortable: false },
       { text: "", value: "detalhes", sortable: false, align: "end" },
     ],
-    items: [
-      {
-        cultura: "Soja",
-        area: "152,45 ha",
-        safra: "20/21",
-      },
-      {
-        cultura: "Soja",
-        area: "152,45 ha",
-        safra: "20/21",
-      },
-    ],
+    items: [],
     telhas: [
       {
         name: "OpenStreetMap",
@@ -575,6 +585,7 @@ export default {
     d: false,
     d2: false,
     dados: {},
+    edit: false,
   }),
   methods: {
     Layer(e) {
@@ -603,7 +614,7 @@ export default {
         this.dialog2 = true;
       }
     },
-    edit(a) {
+    editar(a) {
       if (a == 1) {
         this.type = "TERRENO";
         this.listamodal = this.lista.filter((e) => {

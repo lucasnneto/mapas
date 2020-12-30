@@ -104,6 +104,10 @@ export default {
   },
   watch: {
     polygons() {
+      for (let el in this.drawnItems._layers) {
+        // console.log(this.drawnItems._layers[el]);
+        this.map.removeLayer(this.drawnItems._layers[el]);
+      }
       this.polygons.forEach((e) => {
         var polygon = L.polygon(e.latlngs, {
           color: e.cor,

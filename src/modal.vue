@@ -58,6 +58,15 @@
                 style="width: 100%; height: 28vh"
                 @click:row="clickPolygon"
               >
+                <template v-slot:[`item.cor`]="{ item }">
+                  <v-sheet
+                    :color="item.cor"
+                    elevation="1"
+                    height="18"
+                    width="35"
+                    rounded
+                  ></v-sheet>
+                </template>
                 <template v-slot:[`item.area`]="{ item }">
                   {{ area(item) }}
                 </template>
